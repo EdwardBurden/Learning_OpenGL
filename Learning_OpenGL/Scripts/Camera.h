@@ -7,6 +7,7 @@ static const float MaxPitch = 89;
 class Camera
 {
 public:
+	glm::vec3 CameraPos;
 	glm::mat4 ViewMatrix;
 	glm::mat4 ProjectionMatrix;
 
@@ -16,7 +17,7 @@ public:
 	void UpdateCameraLook(float yaw, float pitch);
 
 private:
-	glm::vec3 CameraPos;
+	
 	glm::vec3 CameraUp;
 	glm::vec3 CameraFront;
 	glm::vec3 CameraRight;

@@ -2,14 +2,13 @@
 
 Camera::Camera()
 {
-	CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	CameraRight = glm::vec3(1.0f, 0.0f, 0.0f);
+	CameraPos = glm::vec3(0.0f, 0.0f, 7.0f);
 	CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	YawValue = -90.0f;
 	PitchValue = 0.0f;
 	ProjectionMatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 500.0f); // 
 	Speed = 2.5f;
+	UpdateCameraLook(0, 0);
 }
 
 void Camera::UpdateCamera(float deltaTime)

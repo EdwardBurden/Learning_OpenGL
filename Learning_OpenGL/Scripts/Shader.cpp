@@ -81,10 +81,29 @@ void Shader::SetUniform(string name, int i1)
 	glUniform1i(vertexColorLocation, i1);
 }
 
+void Shader::SetUniform(string name, float f1)
+{
+	int vertexColorLocation = glGetUniformLocation(ShaderProgramId, name.c_str());
+	glUniform1f(vertexColorLocation, f1);
+
+}
+
 void Shader::SetUniform(string name, glm::mat4 matrix)
 {
 	int vertexColorLocation = glGetUniformLocation(ShaderProgramId, name.c_str());
 	glUniformMatrix4fv(vertexColorLocation, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::SetUniform(string name, glm::vec3 vector)
+{
+	int vertexColorLocation = glGetUniformLocation(ShaderProgramId, name.c_str());
+	glUniform3f(vertexColorLocation, vector.x, vector.y, vector.z);
+}
+
+void Shader::SetUniform(string name, float v1, float v2, float v3)
+{
+	int vertexColorLocation = glGetUniformLocation(ShaderProgramId, name.c_str());
+	glUniform3f(vertexColorLocation, v1, v2, v3);
 }
 
 void Shader::SetUniform(string name, float v1, float v2, float v3, float v4)

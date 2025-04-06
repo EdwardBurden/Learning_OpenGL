@@ -104,13 +104,17 @@
     <ClInclude Include="Scripts\Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\FragmentShader.glsl" />
-    <None Include="Resources\VertesShader.glsl" />
+    <None Include="Resources\default_FragmentShader.glsl" />
+    <None Include="Resources\Lit_FragmentShader.glsl" />
+    <None Include="Resources\Lit_VertexShader.glsl" />
+    <None Include="Resources\default_VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\awesomeface.png" />
     <Image Include="Resources\brick.jpg" />
     <Image Include="Resources\container.jpg" />
+    <Image Include="Resources\container2.png" />
+    <Image Include="Resources\container2_specular.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

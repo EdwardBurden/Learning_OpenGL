@@ -22,7 +22,10 @@ public:
 	~Shader();
 	void Activate();
 	void SetUniform(string name, int i1);
+	void SetUniform(string name, float f1);
 	void SetUniform(string name, glm::mat4 matrix);
+	void SetUniform(string name, glm::vec3 vector);
+	void SetUniform(string name, float v1, float v2, float v3);
 	void SetUniform(string name, float v1, float v2, float v3, float v4);
 private:
 	void Construct(const char* vertexPath,  const char* fragmentPath);

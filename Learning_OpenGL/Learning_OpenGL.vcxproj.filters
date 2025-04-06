@@ -43,8 +43,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\VertesShader.glsl" />
-    <None Include="Resources\FragmentShader.glsl" />
+    <None Include="Resources\default_VertexShader.glsl" />
+    <None Include="Resources\default_FragmentShader.glsl" />
+    <None Include="Resources\Lit_VertexShader.glsl" />
+    <None Include="Resources\Lit_FragmentShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\awesomeface.png">
@@ -54,6 +56,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Resources\container.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\container2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\container2_specular.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
