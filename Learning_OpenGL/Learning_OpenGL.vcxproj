@@ -93,12 +93,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Dependencies\glad\src\glad.c" />
+    <ClCompile Include="Scripts\DirectionalLight.cpp" />
+    <ClCompile Include="Scripts\SceneObject.cpp" />
     <ClCompile Include="Scripts\Camera.cpp" />
     <ClCompile Include="Scripts\main.cpp" />
     <ClCompile Include="Scripts\Shader.cpp" />
     <ClCompile Include="Scripts\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Scripts\DirectionalLight.h" />
+    <ClInclude Include="Scripts\Light.h" />
+    <ClInclude Include="Scripts\SceneObject.h" />
     <ClInclude Include="Scripts\Camera.h" />
     <ClInclude Include="Scripts\Shader.h" />
     <ClInclude Include="Scripts\Texture.h" />

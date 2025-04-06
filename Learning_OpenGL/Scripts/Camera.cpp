@@ -1,8 +1,8 @@
 #include "Camera.h"
 
-Camera::Camera()
+Camera::Camera() : SceneObject{ glm::vec3(0.0) , glm::vec3(0.0) }
 {
-	CameraPos = glm::vec3(0.0f, 0.0f, 7.0f);
+	Position = glm::vec3(0.0f, 0.0f, 7.0f);
 	CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	YawValue = -90.0f;
 	PitchValue = 0.0f;
@@ -11,17 +11,17 @@ Camera::Camera()
 	UpdateCameraLook(0, 0);
 }
 
-void Camera::UpdateCamera(float deltaTime)
+void  Camera::Update(float deltaTime)
 {
-	CameraPos += CameraPosChange * deltaTime * Speed;
-	ViewMatrix = glm::lookAt(CameraPos, CameraPos + CameraFront, CameraUp);
+	Position += CameraPosChange * deltaTime * Speed;
+	ViewMatrix = glm::lookAt(Position, Position + Forward, CameraUp);
 	CameraPosChange = glm::vec3(0, 0, 0);
 }
 
 void Camera::UpdateCameraPosition(glm::vec2 inputVector)
 {
 	glm::vec3 movement = glm::vec3(inputVector.x, 0, inputVector.y);
-	CameraPosChange = (movement.x * CameraRight) + (movement.z * CameraFront);
+	CameraPosChange = (movement.x * CameraRight) + (movement.z * Forward);
 }
 
 void Camera::UpdateCameraLook(float yaw, float pitch)
@@ -38,6 +38,6 @@ void Camera::UpdateCameraLook(float yaw, float pitch)
 	direction.x = cos(glm::radians(YawValue)) * cos(glm::radians(PitchValue));
 	direction.y = sin(glm::radians(PitchValue));
 	direction.z = sin(glm::radians(YawValue)) * cos(glm::radians(PitchValue));
-	CameraFront = glm::normalize(direction);;
-	CameraRight = glm::normalize(glm::cross(CameraUp, CameraFront));
+	Forward = glm::normalize(direction);;
+	CameraRight = glm::normalize(glm::cross(CameraUp, Forward));
 }

@@ -30,6 +30,12 @@
     <ClCompile Include="Scripts\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\SceneObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\DirectionalLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scripts\Shader.h">
@@ -41,12 +47,29 @@
     <ClInclude Include="Scripts\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Scripts\Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\SceneObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\DirectionalLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\default_VertexShader.glsl" />
-    <None Include="Resources\default_FragmentShader.glsl" />
-    <None Include="Resources\Lit_VertexShader.glsl" />
-    <None Include="Resources\Lit_FragmentShader.glsl" />
+    <None Include="Resources\Lit_VertexShader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\default_FragmentShader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\default_VertexShader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\Lit_FragmentShader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\awesomeface.png">

@@ -8,6 +8,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
+#include "DirectionalLight.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
@@ -23,7 +24,6 @@ float lastFrame = 0.0f; // Time of last frame
 float rotateSpeed = 1.0f;
 float lastX = 400, lastY = 300;
 bool firstMouse = true;
-glm::vec3 lightPosWorld = glm::vec3(1.2f, 1.0f, 2.0f);
 
 // ------------------------------------------------------------------
 float vertices[] = {
@@ -71,6 +71,20 @@ float vertices[] = {
 	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
+glm::vec3 cubePositions[] = {
+glm::vec3(0.0f,  -1.0f,  0.0f),
+glm::vec3(2.0f,  5.0f, -15.0f),
+glm::vec3(-1.5f, -2.2f, -2.5f),
+glm::vec3(-3.8f, -2.0f, -12.3f),
+glm::vec3(2.4f, -0.4f, -3.5f),
+glm::vec3(-1.7f,  3.0f, -7.5f),
+glm::vec3(1.3f, -2.0f, -2.5f),
+glm::vec3(1.5f,  2.0f, -2.5f),
+glm::vec3(1.5f,  0.2f, -1.5f),
+glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
+
 unsigned int indices[] = {
 	0, 1, 3, // first triangle
 	1, 2, 3  // second triangle
@@ -114,6 +128,9 @@ int main()
 	Texture containerSpecular("Resources/container2_specular.png", GL_RGBA);
 	Shader lightingShader("Resources/Lit_VertexShader.glsl", "Resources/Lit_FragmentShader.glsl"); // shader for cube lit
 	Shader defualtShader("Resources/default_VertexShader.glsl", "Resources/default_FragmentShader.glsl");
+	DirectionalLight dirLight(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.3f, -1.0f, -0.5));
+
+
 
 	// cube VAO	
 	unsigned int VBO, VAO;
@@ -138,47 +155,34 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glm::mat4 cubeModel = glm::mat4(1.0f);
+	//glm::mat4 cubeModel = glm::mat4(1.0f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		camera1.UpdateCamera(deltaTime);
+		camera1.Update(deltaTime);
 		ProcessKeyboardInput(window);
 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		//cubeModel = glm::rotate(cubeModel, rotateSpeed * deltaTime, glm::vec3(0.4f, 0.2f, 0.8f));
 
 		lightingShader.Activate();
 		//Vertex
-		lightingShader.SetUniform("model", cubeModel);
+		//lightingShader.SetUniform("model", cubeModel);
 		lightingShader.SetUniform("view", camera1.ViewMatrix);
 		lightingShader.SetUniform("projection", camera1.ProjectionMatrix);
 		//Frag
-
-		glm::vec3 lightColor;
-		lightColor.x = sin(currentFrame * 2.0f);
-		lightColor.y = sin(currentFrame * 0.7f);
-		lightColor.z = sin(currentFrame * 1.3f);
-		lightColor *= 2;
-		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
-		glm::vec3 ambientColor = lightColor * glm::vec3(0.1f);
-		glm::vec3 specularColor = lightColor * glm::vec3(0.5f);
-
-
-		lightingShader.SetUniform("light.position", lightPosWorld);
-		lightingShader.SetUniform("light.ambient", ambientColor);
-		lightingShader.SetUniform("light.diffuse", diffuseColor);
-		lightingShader.SetUniform("light.specular", specularColor);
+		//update lighting for all lights in scene
+		dirLight.UpdateShader(lightingShader);
 		lightingShader.SetUniform("material.diffuseMap", 0); // 0 = sampler 0
 		lightingShader.SetUniform("material.specularMap", 1);
 		lightingShader.SetUniform("material.shininessAmount", 32.0f);
 		lightingShader.SetUniform("lightColor", 1.0f, 1.0f, 1.0f);
-		lightingShader.SetUniform("viewPos", camera1.CameraPos);
+		lightingShader.SetUniform("viewPos", camera1.Position);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, container.TextureId);
@@ -186,13 +190,34 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, containerSpecular.TextureId);
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (unsigned int i = 0; i <10; i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			lightingShader.SetUniform("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		lightModel = glm::mat4(1.0f);
-		lightModel = glm::translate(lightModel, lightPosWorld);
-		lightModel = glm::scale(lightModel, glm::vec3(0.2f));;
+		//lightModel = glm::translate(lightModel, dirLight.Position);
+		//lightModel = glm::scale(lightModel, glm::vec3(0.2f));;
+
+		//dirLight.Forward.x = glm::sin(currentFrame/5)*5;
+		//dirLight.Forward.y = glm::cos(currentFrame) * 2;
+		//dirLight.Forward.z = glm::cos(currentFrame/5)*5;
+
+	//	dirLight.Position = -dirLight.Forward;
+		glm::mat4 rotate = glm::lookAt(dirLight.Position, dirLight.Position + dirLight.Forward, glm::vec3(0.0f, 1.0f, 0.0f));
+		lightModel = glm::inverse(rotate);
+
+
 		defualtShader.Activate();
-		defualtShader.SetUniform("color", lightColor);
+		dirLight.UpdateShader(defualtShader);
 		defualtShader.SetUniform("model", lightModel);
 		defualtShader.SetUniform("view", camera1.ViewMatrix);
 		defualtShader.SetUniform("projection", camera1.ProjectionMatrix);
