@@ -1,6 +1,6 @@
 #pragma once
-#include "Shader.h"
-#include "SceneObject.h"
+#include "../Shader.h"
+#include "../SceneObject.h"
 
 class Light : public SceneObject
 {

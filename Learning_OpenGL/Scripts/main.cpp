@@ -6,9 +6,13 @@
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <gtx/transform2.hpp>
 #include <gtc/type_ptr.hpp>
 
-#include "DirectionalLight.h"
+#include "Light/SpotLight.h"
+#include "Light/DirectionalLight.h"
+#include "Light/PointLight.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
@@ -128,9 +132,9 @@ int main()
 	Texture containerSpecular("Resources/container2_specular.png", GL_RGBA);
 	Shader lightingShader("Resources/Lit_VertexShader.glsl", "Resources/Lit_FragmentShader.glsl"); // shader for cube lit
 	Shader defualtShader("Resources/default_VertexShader.glsl", "Resources/default_FragmentShader.glsl");
-	DirectionalLight dirLight(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.3f, -1.0f, -0.5));
-
-
+	SpotLight light(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+	PointLight pointLight(glm::vec3(4.0f, 3.0f, 0.0f), glm::vec3(0.3f, -1.0f, -0.5)); //todo make into array
+	DirectionalLight dirLioght(glm::vec3(4.0f, 3.0f, 0.0f), glm::vec3(0.3f, -1.0f, -0.5));
 
 	// cube VAO	
 	unsigned int VBO, VAO;
@@ -163,6 +167,8 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		camera1.Update(deltaTime);
+		light.Position = camera1.Position;
+		light.Forward = camera1.Forward;
 		ProcessKeyboardInput(window);
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -177,7 +183,10 @@ int main()
 		lightingShader.SetUniform("projection", camera1.ProjectionMatrix);
 		//Frag
 		//update lighting for all lights in scene
-		dirLight.UpdateShader(lightingShader);
+		light.UpdateShader(lightingShader);
+		pointLight.UpdateShader(lightingShader);
+		dirLioght.UpdateShader(lightingShader);
+		lightingShader.SetUniform("pointLightsNum", 1);
 		lightingShader.SetUniform("material.diffuseMap", 0); // 0 = sampler 0
 		lightingShader.SetUniform("material.specularMap", 1);
 		lightingShader.SetUniform("material.shininessAmount", 32.0f);
@@ -204,20 +213,12 @@ int main()
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		lightModel = glm::mat4(1.0f);
-		//lightModel = glm::translate(lightModel, dirLight.Position);
-		//lightModel = glm::scale(lightModel, glm::vec3(0.2f));;
-
-		//dirLight.Forward.x = glm::sin(currentFrame/5)*5;
-		//dirLight.Forward.y = glm::cos(currentFrame) * 2;
-		//dirLight.Forward.z = glm::cos(currentFrame/5)*5;
-
-	//	dirLight.Position = -dirLight.Forward;
-		glm::mat4 rotate = glm::lookAt(dirLight.Position, dirLight.Position + dirLight.Forward, glm::vec3(0.0f, 1.0f, 0.0f));
-		lightModel = glm::inverse(rotate);
-
+		lightModel = glm::translate(lightModel, light.Position + glm::vec3(1));
+		lightModel = glm::scale(lightModel, glm::vec3(0.2f, 0.2f, 0.2f));
+		//lightModel = glm::shearX3D(lightModel, 2.0f, 0.0f);
 
 		defualtShader.Activate();
-		dirLight.UpdateShader(defualtShader);
+		light.UpdateShader(defualtShader);
 		defualtShader.SetUniform("model", lightModel);
 		defualtShader.SetUniform("view", camera1.ViewMatrix);
 		defualtShader.SetUniform("projection", camera1.ProjectionMatrix);
