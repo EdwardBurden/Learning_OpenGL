@@ -21,6 +21,7 @@ public:
 	Shader(string vertexPath, string fragmentPath);
 	~Shader();
 	void Activate();
+	void SetUniform(string name, unsigned int ui1);
 	void SetUniform(string name, int i1);
 	void SetUniform(string name, float f1);
 	void SetUniform(string name, glm::mat4 matrix);

@@ -75,6 +75,12 @@ void Shader::Activate()
 	glUseProgram(ShaderProgramId);
 }
 
+void Shader::SetUniform(string name, unsigned int ui1)
+{
+	int vertexColorLocation = glGetUniformLocation(ShaderProgramId, name.c_str());
+	glUniform1ui(vertexColorLocation, ui1);
+}
+
 void Shader::SetUniform(string name, int i1)
 {
 	int vertexColorLocation = glGetUniformLocation(ShaderProgramId, name.c_str());

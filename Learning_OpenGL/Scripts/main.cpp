@@ -10,12 +10,18 @@
 #include <gtx/transform2.hpp>
 #include <gtc/type_ptr.hpp>
 
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "Light/SpotLight.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Shader.h"
 #include "Camera.h"
-#include "Texture.h"
+#include "Model.h"
+#include "ModelLoader.h"
 using namespace std;
 
 static void ProcessKeyboardInput(GLFWwindow* window);
@@ -122,68 +128,50 @@ int main()
 		return -1;
 	}
 	glViewport(0, 0, 800, 600);
-
 	glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, MouseInputCallback);
 	glEnable(GL_DEPTH_TEST);
 
-	Texture container("Resources/container2.png", GL_RGBA);
-	Texture containerSpecular("Resources/container2_specular.png", GL_RGBA);
+	//Texture container("Resources/container2.png", GL_RGBA);
+	//Texture containerSpecular("Resources/container2_specular.png", GL_RGBA);
 	Shader lightingShader("Resources/Lit_VertexShader.glsl", "Resources/Lit_FragmentShader.glsl"); // shader for cube lit
 	Shader defualtShader("Resources/default_VertexShader.glsl", "Resources/default_FragmentShader.glsl");
-	SpotLight light(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+	//SpotLight light(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 	PointLight pointLight(glm::vec3(4.0f, 3.0f, 0.0f), glm::vec3(0.3f, -1.0f, -0.5)); //todo make into array
 	DirectionalLight dirLioght(glm::vec3(4.0f, 3.0f, 0.0f), glm::vec3(0.3f, -1.0f, -0.5));
 
 	// cube VAO	
-	unsigned int VBO, VAO;
-	glGenBuffers(1, &VBO);
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	int stride = (3 * sizeof(float) * 2) + (2 * sizeof(float));
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float) * 2));
-	glEnableVertexAttribArray(2);
-
-	// light VAO
-	unsigned int L_VBO;
-	glGenVertexArrays(1, &L_VBO);
-	glBindVertexArray(L_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-	glEnableVertexAttribArray(0);
-
-	//glm::mat4 cubeModel = glm::mat4(1.0f);
-	glm::mat4 lightModel = glm::mat4(1.0f);
+	Model* mothership = ModelLoader::LoadModel("Resources/Models/Mothership.obj");
+	Model mymodel = *mothership;
+	//Model mothership("Resources/Mothership.obj");
+	glm::mat4 cubeModel = glm::mat4(1.0f);
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		camera1.Update(deltaTime);
-		light.Position = camera1.Position;
-		light.Forward = camera1.Forward;
+		//light.Position = camera1.Position;
+		//light.Forward = camera1.Forward;
 		ProcessKeyboardInput(window);
 
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.8f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glm::mat4 cubeModel = glm::mat4(1.0f);
 		//cubeModel = glm::rotate(cubeModel, rotateSpeed * deltaTime, glm::vec3(0.4f, 0.2f, 0.8f));
+		cubeModel = glm::translate(cubeModel, glm::vec3(0.0f, 0.0f, 0.0f));
+		cubeModel = glm::scale(cubeModel, glm::vec3(0.1f, 0.1f, 0.1f));
 
 		lightingShader.Activate();
 		//Vertex
-		//lightingShader.SetUniform("model", cubeModel);
+		lightingShader.SetUniform("model", cubeModel);
 		lightingShader.SetUniform("view", camera1.ViewMatrix);
 		lightingShader.SetUniform("projection", camera1.ProjectionMatrix);
 		//Frag
 		//update lighting for all lights in scene
-		light.UpdateShader(lightingShader);
+		//light.UpdateShader(lightingShader);
 		pointLight.UpdateShader(lightingShader);
 		dirLioght.UpdateShader(lightingShader);
 		lightingShader.SetUniform("pointLightsNum", 1);
@@ -193,43 +181,10 @@ int main()
 		lightingShader.SetUniform("lightColor", 1.0f, 1.0f, 1.0f);
 		lightingShader.SetUniform("viewPos", camera1.Position);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, container.TextureId);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, containerSpecular.TextureId);
-		glBindVertexArray(VAO);
-		for (unsigned int i = 0; i <10; i++)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			lightingShader.SetUniform("model", model);
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		lightModel = glm::mat4(1.0f);
-		lightModel = glm::translate(lightModel, light.Position + glm::vec3(1));
-		lightModel = glm::scale(lightModel, glm::vec3(0.2f, 0.2f, 0.2f));
-		//lightModel = glm::shearX3D(lightModel, 2.0f, 0.0f);
-
-		defualtShader.Activate();
-		light.UpdateShader(defualtShader);
-		defualtShader.SetUniform("model", lightModel);
-		defualtShader.SetUniform("view", camera1.ViewMatrix);
-		defualtShader.SetUniform("projection", camera1.ProjectionMatrix);
-		glBindVertexArray(L_VBO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		glBindVertexArray(0);
+		mymodel.Draw(lightingShader);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-	glDeleteBuffers(1, &VBO);
 	glfwTerminate();
 	return 0;
 }

@@ -33,8 +33,11 @@ struct SpotLight {
 };
 
 struct Material {
-    sampler2D diffuseMap;
-    sampler2D specularMap;
+ sampler2D texture_diffuse1;
+ sampler2D texture_diffuse2;
+ sampler2D texture_diffuse3;
+ sampler2D texture_specular1;
+ sampler2D texture_specular2;
     float shininessAmount;
 };
 
@@ -130,8 +133,8 @@ uniform vec3 viewPos;
 out vec4 FragColor;
 
 void main() {
-    vec3 sampledDiffuse = vec3(texture(material.diffuseMap, TexCoords));
-    vec3 sampledSpecular = vec3(texture(material.specularMap, TexCoords));
+    vec3 sampledDiffuse = vec3(texture(material.texture_diffuse1, TexCoords));
+    vec3 sampledSpecular = vec3(texture(material.texture_specular1, TexCoords));
     vec3 viewDir = normalize(viewPos - WorldPos);
     vec3 norm = normalize(Normal);
  vec3 result = vec3(0.0);
@@ -142,4 +145,5 @@ void main() {
 }
     result += CalculateSpotLight(spotLight, material, sampledDiffuse, sampledSpecular, norm, WorldPos, viewDir);
     FragColor = vec4(result, 1);
+    // FragColor = vec4(1);
 }

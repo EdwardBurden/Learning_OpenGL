@@ -16,7 +16,7 @@ void SpotLight::UpdateShader(Shader& shader)
 	shader.SetUniform("spotLight.quadratic", 0.0032f);
 
 	shader.SetUniform("spotLight.direction",Forward);
-	shader.SetUniform("spotLight.cutOff", glm::cos(glm::radians(0.5f)));
-	shader.SetUniform("spotLight.outerCutOff", glm::cos(glm::radians(5.0f)));
+	shader.SetUniform("spotLight.cutOff", glm::cos(glm::radians(3.5f)));
+	shader.SetUniform("spotLight.outerCutOff", glm::cos(glm::radians(7.0f)));
 
 }

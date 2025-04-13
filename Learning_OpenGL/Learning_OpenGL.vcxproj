@@ -57,16 +57,17 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Dependencies\glm;$(SolutionDir)\Dependencies\stb_image;$(SolutionDir)\Dependencies\glfw\include;$(SolutionDir)\Dependencies\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Dependencies\glm;$(SolutionDir)\Dependencies\stb_image;$(SolutionDir)\Dependencies\glfw\include;$(SolutionDir)\Dependencies\assimp\include;$(SolutionDir)\Dependencies\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\assimp\src;$(SolutionDir)\Dependencies\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /E /I /Y "$(ProjectDir)Resources" "$(TargetDir)Resources"</Command>
+      <Command>xcopy /E /I /Y "$(ProjectDir)Resources" "$(TargetDir)Resources"
+xcopy /E /I /Y "$(SolutionDir)Dependencies\assimp\src\assimp-vc143-mt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -77,39 +78,43 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Dependencies\glm;$(SolutionDir)\Dependencies\stb_image;$(SolutionDir)\Dependencies\glfw\include;$(SolutionDir)\Dependencies\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Dependencies\glm;$(SolutionDir)\Dependencies\stb_image;$(SolutionDir)\Dependencies\glfw\include;$(SolutionDir)\Dependencies\assimp\include;$(SolutionDir)\Dependencies\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\assimp\src;$(SolutionDir)\Dependencies\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /E /I /Y "$(ProjectDir)Resources" "$(TargetDir)Resources"</Command>
+      <Command>xcopy /E /I /Y "$(ProjectDir)Resources" "$(TargetDir)Resources"
+xcopy /E /I /Y "$(SolutionDir)Dependencies\assimp\src\assimp-vc143-mt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Dependencies\glad\src\glad.c" />
+    <ClCompile Include="Scripts\Model.cpp" />
+    <ClCompile Include="Scripts\Mesh.cpp" />
     <ClCompile Include="Scripts\Light\PointLight.cpp" />
     <ClCompile Include="Scripts\Light\DirectionalLight.cpp" />
     <ClCompile Include="Scripts\SceneObject.cpp" />
     <ClCompile Include="Scripts\Camera.cpp" />
     <ClCompile Include="Scripts\main.cpp" />
     <ClCompile Include="Scripts\Shader.cpp" />
-    <ClCompile Include="Scripts\Texture.cpp" />
     <ClCompile Include="Scripts\Light\SpotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Scripts\Model.h" />
+    <ClInclude Include="Scripts\Mesh.h" />
     <ClInclude Include="Scripts\Light\PointLight.h" />
     <ClInclude Include="Scripts\Light\DirectionalLight.h" />
     <ClInclude Include="Scripts\Light\Light.h" />
+    <ClInclude Include="Scripts\ModelLoader.h" />
     <ClInclude Include="Scripts\SceneObject.h" />
     <ClInclude Include="Scripts\Camera.h" />
     <ClInclude Include="Scripts\Shader.h" />
-    <ClInclude Include="Scripts\Texture.h" />
     <ClInclude Include="Scripts\Light\SpotLight.h" />
   </ItemGroup>
   <ItemGroup>
