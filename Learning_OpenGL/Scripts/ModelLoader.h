@@ -20,10 +20,7 @@ public:
 	static Model* LoadModel(string path) {
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(path,
-			aiProcess_CalcTangentSpace |
-			aiProcess_Triangulate |
-			aiProcess_JoinIdenticalVertices |
-			aiProcess_SortByPType);
+			aiProcess_Triangulate | aiProcess_FlipUVs);
 
 
 		if (nullptr == scene) {
@@ -37,38 +34,52 @@ public:
 			cout << "ERROR::ASSIMP::" << importer.GetErrorString() << endl;
 			return nullptr;
 		}
-
+		vector<Texture> textures_loaded;
 		string directory = path.substr(0, path.find_last_of('/'));
 		std::vector<Mesh> meshes;
-
-		ProcessNode(scene->mRootNode, scene, meshes, directory);
+		ProcessNode(textures_loaded, scene->mRootNode, scene, meshes, directory);
 		Model* model = new Model(meshes);
 		return model;
 	};
 
 private:
 
-	static void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, string& directory) {
+	static void ProcessNode(vector<Texture> &textures_loaded, aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, string& directory) {
 
 		if (node == nullptr)
-			return;
-
+			return;		
+		
+		
+		
 		for (size_t i = 0; i < node->mNumMeshes; i++)
 		{
 			unsigned int meshIndex = node->mMeshes[i];
 			aiMesh* mesh = scene->mMeshes[meshIndex];
-			Mesh meshMade = ProcessMesh(mesh, scene, directory);
+			Mesh meshMade = ProcessMesh(textures_loaded, mesh, scene, directory);
+			meshMade.Tranform = ConvertMatrixToGLMFormat(node->mTransformation);
 			meshes.push_back(meshMade);
 		}
 
 		for (size_t i = 0; i < node->mNumChildren; i++)
 		{
-			ProcessNode(node->mChildren[i], scene, meshes , directory);
+
+			ProcessNode(textures_loaded, node->mChildren[i], scene, meshes, directory);
 		}
 	}
 
+	static inline glm::mat4 ConvertMatrixToGLMFormat(const aiMatrix4x4& from)
+	{
+		glm::mat4 to;
+		//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column
+		to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
+		to[0][1] = from.b1; to[1][1] = from.b2; to[2][1] = from.b3; to[3][1] = from.b4;
+		to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = from.c4;
+		to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
+		return to;
+	}
 
-	static Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene, string directory) {
+
+	static Mesh ProcessMesh(vector<Texture>& textures_loaded, aiMesh* mesh, const aiScene* scene, string directory) {
 		vector<Vertex> vertices;
 		vector<unsigned int> indices;
 		vector<Texture> textures;
@@ -110,29 +121,43 @@ private:
 		}
 
 		unsigned int matIndex = mesh->mMaterialIndex;
-		if (matIndex >= 0) {
+		if (matIndex > 0) { // dont care for mat 0
 			aiMaterial* mat = scene->mMaterials[matIndex];
-			std::vector<Texture> diffuseMaps = Loadtextures(mat, aiTextureType_DIFFUSE, "texture_diffuse", directory);
+			aiString name;
+			mat->Get(AI_MATKEY_NAME, name);
+			std::vector<Texture> diffuseMaps = Loadtextures(textures_loaded,mat, aiTextureType_DIFFUSE, "texture_diffuse", directory);
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-			std::vector<Texture> specularMaps = Loadtextures(mat, aiTextureType_SPECULAR, "texture_specular", directory);
+			std::vector<Texture> specularMaps = Loadtextures(textures_loaded, mat, aiTextureType_SPECULAR, "texture_specular", directory);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		}
-
-		Mesh meshmade(vertices, textures, indices);
+		Mesh meshmade( vertices, textures, indices);
 		return meshmade;
 	}
 
-	static std::vector<Texture> Loadtextures(aiMaterial* mat, aiTextureType type, string typeName, string& directory) {
+	static std::vector<Texture> Loadtextures(vector<Texture>& textures_loaded, aiMaterial* mat, aiTextureType type, string typeName, string& directory) {
 		std::vector<Texture> textures;
-
-		for (size_t i = 0; i < mat->GetTextureCount(type); i++)
+		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 		{
 			aiString path;
 			mat->GetTexture(type, i, &path);
+			bool skip = false;
+			for (unsigned int j = 0; j < textures_loaded.size(); j++)
+			{
+				if (std::strcmp(textures_loaded[j].path.data(), path.C_Str()) == 0) {
+					textures.push_back(textures_loaded[j]);
+					skip = true;
+					break;
+				}
+
+			}
+			if (skip)
+				continue;
 			Texture texture;
 			texture.Id = LoadTextureFromFile(path, directory);
 			texture.type = typeName;
+			texture.path = path.C_Str();
 			textures.push_back(texture);
+			textures_loaded.push_back(texture);
 		}
 
 		return textures;
@@ -151,14 +176,15 @@ private:
 		GLenum format;
 		switch (nrChannels)
 		{
-			case 1:	format = GL_RED;
-				break;
-			case 3:	format = GL_RGB;
-				break;
-			case 4:	format = GL_RGBA;
-				break;
-			default:
-				break;
+		case 1:	format = GL_RED;
+			break;
+		case 3:
+			format = GL_RGB;
+			break;
+		case 4:	format = GL_RGBA;
+			break;
+		default:
+			break;
 		}
 
 		glGenTextures(1, &textureId);

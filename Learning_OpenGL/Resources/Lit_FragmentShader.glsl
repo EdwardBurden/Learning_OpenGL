@@ -133,7 +133,18 @@ uniform vec3 viewPos;
 out vec4 FragColor;
 
 void main() {
+//FragColor = vec4(TexCoords , 0 , 1);
     vec3 sampledDiffuse = vec3(texture(material.texture_diffuse1, TexCoords));
+     FragColor = vec4(sampledDiffuse, 1);
+ /* vec3 lightDir = normalize(-directionLight.direction);
+   float normLightDot = dot(Normal, lightDir);
+    float diffAmount = max(normLightDot, 0.0);
+    vec3 diffuse = diffAmount * directionLight.diffuse;
+     FragColor = vec4(Normal,1);
+     *
+     vec3 sampledDiffuse = vec3(texture(material.texture_diffuse1, TexCoords));
+     FragColor = vec4(sampledDiffuse, 1);
+  /*  vec3 sampledDiffuse = vec3(texture(material.texture_diffuse1, TexCoords));
     vec3 sampledSpecular = vec3(texture(material.texture_specular1, TexCoords));
     vec3 viewDir = normalize(viewPos - WorldPos);
     vec3 norm = normalize(Normal);
@@ -144,6 +155,6 @@ void main() {
   	result += max( CalculatePointLight(pointLights[i], material, sampledDiffuse, sampledSpecular, norm,WorldPos, viewDir) , vec3(0));
 }
     result += CalculateSpotLight(spotLight, material, sampledDiffuse, sampledSpecular, norm, WorldPos, viewDir);
-    FragColor = vec4(result, 1);
+    FragColor = vec4(result, 1);*/
     // FragColor = vec4(1);
 }

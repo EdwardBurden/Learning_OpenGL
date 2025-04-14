@@ -24,13 +24,15 @@ struct Vertex {
 struct Texture {
 	unsigned int Id;
 	std::string type;
+	string path;  // we store the path of the texture to compare with other textures
 };
 
 class Mesh
 {
 public:
-	Mesh(std::vector<Vertex> verts, std::vector<Texture> tex, std::vector<unsigned int> inds);
-	void BindTextures(Shader& shader);
+	glm::mat4 Tranform;
+	Mesh( std::vector<Vertex> verts, std::vector<Texture> tex, std::vector<unsigned int> inds);
+	void BindTextures(glm::mat4 parent, Shader& shader);
 	void Draw();
 
 private:
@@ -41,6 +43,9 @@ private:
 	unsigned int VAOId;
 	unsigned int VBOId;
 	unsigned int EBOId;
+
+	
+
 	std::vector<Vertex> Vertices;
 	std::vector<Texture> Textures;
 	std::vector<unsigned int> Indices;

@@ -7,7 +7,7 @@ Camera::Camera() : SceneObject{ glm::vec3(0.0) , glm::vec3(0.0) }
 	YawValue = -90.0f;
 	PitchValue = 0.0f;
 	ProjectionMatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 500.0f); // 
-	Speed = 2.5f;
+	Speed = 12.0f;
 	UpdateCameraLook(0, 0);
 }
 

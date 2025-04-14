@@ -138,11 +138,11 @@ int main()
 	Shader lightingShader("Resources/Lit_VertexShader.glsl", "Resources/Lit_FragmentShader.glsl"); // shader for cube lit
 	Shader defualtShader("Resources/default_VertexShader.glsl", "Resources/default_FragmentShader.glsl");
 	//SpotLight light(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-	PointLight pointLight(glm::vec3(4.0f, 3.0f, 0.0f), glm::vec3(0.3f, -1.0f, -0.5)); //todo make into array
+	//PointLight pointLight(glm::vec3(4.0f, 3.0f, 0.0f), glm::vec3(0.3f, -1.0f, -0.5)); //todo make into array
 	DirectionalLight dirLioght(glm::vec3(4.0f, 3.0f, 0.0f), glm::vec3(0.3f, -1.0f, -0.5));
 
 	// cube VAO	
-	Model* mothership = ModelLoader::LoadModel("Resources/Models/Mothership.obj");
+	Model* mothership = ModelLoader::LoadModel("Resources/Models/backpack/backpack.obj");
 	Model mymodel = *mothership;
 	//Model mothership("Resources/Mothership.obj");
 	glm::mat4 cubeModel = glm::mat4(1.0f);
@@ -161,22 +161,20 @@ int main()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glm::mat4 cubeModel = glm::mat4(1.0f);
 		//cubeModel = glm::rotate(cubeModel, rotateSpeed * deltaTime, glm::vec3(0.4f, 0.2f, 0.8f));
-		cubeModel = glm::translate(cubeModel, glm::vec3(0.0f, 0.0f, 0.0f));
-		cubeModel = glm::scale(cubeModel, glm::vec3(0.1f, 0.1f, 0.1f));
+		//cubeModel = glm::translate(cubeModel, glm::vec3(0.0f, 0.0f, 0.0f));
+		//cubeModel = glm::scale(cubeModel, glm::vec3(0.1f, 0.1f, 0.1f));
 
 		lightingShader.Activate();
 		//Vertex
-		lightingShader.SetUniform("model", cubeModel);
+		//lightingShader.SetUniform("model", cubeModel);
 		lightingShader.SetUniform("view", camera1.ViewMatrix);
 		lightingShader.SetUniform("projection", camera1.ProjectionMatrix);
 		//Frag
 		//update lighting for all lights in scene
 		//light.UpdateShader(lightingShader);
-		pointLight.UpdateShader(lightingShader);
+		//pointLight.UpdateShader(lightingShader);
 		dirLioght.UpdateShader(lightingShader);
 		lightingShader.SetUniform("pointLightsNum", 1);
-		lightingShader.SetUniform("material.diffuseMap", 0); // 0 = sampler 0
-		lightingShader.SetUniform("material.specularMap", 1);
 		lightingShader.SetUniform("material.shininessAmount", 32.0f);
 		lightingShader.SetUniform("lightColor", 1.0f, 1.0f, 1.0f);
 		lightingShader.SetUniform("viewPos", camera1.Position);
