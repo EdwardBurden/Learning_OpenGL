@@ -1,2 +1,5 @@
 # Learning_OpenGL
-Space to store the code made while following he learning OpenGL series
+Some code made while following the learning OpenGL series.
+All Work In Progress 
+
+
