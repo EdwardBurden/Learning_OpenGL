@@ -15,7 +15,6 @@ void main()
 {
     gl_Position = projection * view * model * vec4(aPos, 1.0);
     WorldPos = vec3(model * vec4(aPos, 1.0));
-    Normal = aNormal;
-   // Normal = normalize( mat3(transpose(inverse(model))) * aNormal);  //todo pass through from cpu
+    Normal = normalize( mat3(transpose(inverse(model))) * aNormal);  //todo pass through from cpu
     TexCoords = aTexCoord;
 } 

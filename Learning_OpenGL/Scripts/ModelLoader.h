@@ -20,7 +20,7 @@ public:
 	static Model* LoadModel(string path) {
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(path,
-			aiProcess_Triangulate | aiProcess_FlipUVs);
+			aiProcess_Triangulate | aiProcess_FlipUVs); //FlipUvs needs looking at
 
 
 		if (nullptr == scene) {
