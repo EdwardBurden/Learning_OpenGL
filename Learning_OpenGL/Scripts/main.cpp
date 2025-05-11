@@ -76,11 +76,8 @@ int main()
 	//Model* loadedModelPtr = ModelLoader::LoadModel("Resources/Models/backpack/backpack.fbx"); //TODO revist when blender export paths are set to relative
 	Model* loadedModelPtr = ModelLoader::LoadModel("Resources/Models/backpack/backpack.obj");
 	Model mymodel = *loadedModelPtr; //testing allocation worked, can remove
-
 	Model* objTest = ModelLoader::LoadModel("Resources/Models/Mothership/Mothership.obj");
-	objTest->TempTransformMatrix = glm::translate(objTest->TempTransformMatrix, glm::vec3(0.0, 0.0f, -10.0f));
-	objTest->TempTransformMatrix = glm::scale(objTest->TempTransformMatrix, glm::vec3(0.2f));
-	glm::mat4 cubeModel = glm::mat4(1.0f);
+	float scale = 1.4f;
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -92,16 +89,20 @@ int main()
 		ProcessKeyboardInput(window);
 
 		glClearColor(0.8f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_STENCIL_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glm::mat4 cubeModel = glm::mat4(1.0f);
 
 		lightingShader.Activate();
+
 		//Vertex
 		//TODO can move into camera class
 		//lightingShader.SetUniform("model", cubeModel);
 		lightingShader.SetUniform("view", camera1.ViewMatrix);
 		lightingShader.SetUniform("projection", camera1.ProjectionMatrix);
+	
 		//Frag
 		//update lighting for all lights in scene
 		spotLight.UpdateShader(lightingShader);
@@ -111,9 +112,47 @@ int main()
 		lightingShader.SetUniform("material.shininessAmount", 32.0f);
 		lightingShader.SetUniform("lightColor", 1.0f, 1.0f, 1.0f);
 		lightingShader.SetUniform("viewPos", camera1.Position);
-
+		
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
+		mymodel.TempTransformMatrix = glm::mat4(1.0f);
 		mymodel.Draw(lightingShader);
+		/*for (unsigned int i = 0; i < 4; i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(0.0, 0.0f, -4.0f*i));
+			model = glm::scale(model, glm::vec3(0.2f));
+			objTest->TempTransformMatrix = model;
+			objTest->Draw(lightingShader);
+		}*/
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0, 10.0f, -2.0f));
+		model = glm::scale(model, glm::vec3(0.2f));
+		objTest->TempTransformMatrix = model;
 		objTest->Draw(lightingShader);
+
+
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		glDisable(GL_DEPTH_TEST);		
+		defualtShader.Activate();	
+		defualtShader.SetUniform("view", camera1.ViewMatrix);
+		defualtShader.SetUniform("projection", camera1.ProjectionMatrix);
+		 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0, 10.0f, -2.0f));
+		model = glm::scale(model, glm::vec3(0.2f*scale));
+		objTest->TempTransformMatrix = model;
+		objTest->Draw(defualtShader);
+
+		mymodel.TempTransformMatrix = glm::mat4(1.0f);
+		mymodel.TempTransformMatrix = glm::scale(mymodel.TempTransformMatrix, glm::vec3( scale));
+		mymodel.Draw(defualtShader);
+
+
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glEnable(GL_DEPTH_TEST);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
