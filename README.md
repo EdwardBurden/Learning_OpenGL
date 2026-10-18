@@ -18,7 +18,6 @@ Code written while following the [Learn OpenGL](https://learnopengl.com/) tutori
 | --- | --- |
 | `W` `A` `S` `D` | Move the camera |
 | Mouse | Look around |
-| `Space` | Toggle the rotation speed value |
 | `Esc` | Quit |
 
 ## Requirements
